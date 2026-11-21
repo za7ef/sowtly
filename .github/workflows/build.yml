@@ -73,11 +73,13 @@ jobs:
 
       - name: رقم الإصدار
         id: ver
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
+          # رقم الإصدار: يُرفع تلقائيًا إذا كان الرقم الحالي منشورًا من قبل، فلا يتكرر في أكثر من بناء
+          python3 scripts/next_version.py project.yml --commit
           # رقم البناء = رقم تشغيل الـCI (نفس رقم وسم build-N)
           sed -i '' -E "s/CURRENT_PROJECT_VERSION: \"[0-9]+\"/CURRENT_PROJECT_VERSION: \"${{ github.run_number }}\"/" project.yml
-          V=$(grep -E 'MARKETING_VERSION:' project.yml | head -1 | sed -E 's/.*"(.*)".*/\1/')
-          echo "version=$V" >> $GITHUB_OUTPUT
           grep -E "MARKETING_VERSION|CURRENT_PROJECT_VERSION" project.yml
 
       - name: ذاكرة Rust المؤقتة
