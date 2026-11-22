@@ -17,7 +17,7 @@ concurrency:
 jobs:
   build:
     runs-on: macos-26
-    timeout-minutes: 90
+    timeout-minutes: 150
     steps:
       - uses: actions/checkout@v4
 
@@ -79,8 +79,12 @@ jobs:
           # رقم الإصدار: يُرفع تلقائيًا إذا كان الرقم الحالي منشورًا من قبل، فلا يتكرر في أكثر من بناء
           python3 scripts/next_version.py project.yml --commit
           # رقم البناء = رقم تشغيل الـCI (نفس رقم وسم build-N)
-          sed -i '' -E "s/CURRENT_PROJECT_VERSION: \"[0-9]+\"/CURRENT_PROJECT_VERSION: \"${{ github.run_number }}\"/" project.yml
-          grep -E "MARKETING_VERSION|CURRENT_PROJECT_VERSION" project.yml
+          sed -i '' -E "s/CURRENT_PROJECT_VERSION: \"[0-9]+\"/CURRENT_PROJECT_VERSION: \"${{ github.run_number }}\"/" project.yml Lite/lite.yml
+          grep -E "MARKETING_VERSION|CURRENT_PROJECT_VERSION" project.yml Lite/lite.yml
+          # رقم إصدار «صوت لايت» مستقل في Lite/lite.yml (يُرفع يدويًا)
+          LV=$(grep -m1 -E 'MARKETING_VERSION:' Lite/lite.yml | sed -E 's/.*"([0-9.]+)".*/\1/')
+          echo "lite=$LV" >> "$GITHUB_OUTPUT"
+          echo "Sawt Lite version: $LV"
 
       - name: ذاكرة Rust المؤقتة
         uses: actions/cache@v4
@@ -143,6 +147,24 @@ jobs:
             2>&1 | tee build.log | grep -E "error:|warning: unre|BUILD|ARCHIVE" || true
           test -d build/Sawt.xcarchive/Products/Applications/Sawt.app
 
+      - name: بناء صوت لايت
+        id: lite
+        # فشل بناء لايت لا يوقف إصدار Sowtly
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          xcodebuild archive -project Sawt.xcodeproj -scheme SawtLite -configuration Release \
+            -destination 'generic/platform=iOS' -archivePath build/SawtLite.xcarchive \
+            -clonedSourcePackagesDirPath spm \
+            -skipMacroValidation -skipPackagePluginValidation \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            2>&1 | tee build-lite.log | grep -E "error:|warning: unre|BUILD|ARCHIVE" || true
+          test -d build/SawtLite.xcarchive/Products/Applications/SawtLite.app
+
+      - name: سجل أخطاء صوت لايت
+        if: steps.lite.outcome == 'failure'
+        run: grep -E "error:" -A3 build-lite.log | head -200 || true
+
       - name: سجل الأخطاء
         if: failure()
         run: grep -E "error:" -A3 build.log | head -200 || true
@@ -169,19 +191,39 @@ jobs:
           zip -qry Sawt.ipa Payload
           ls -lh Sawt.ipa
 
+      - name: تجهيز IPA صوت لايت
+        if: steps.lite.outcome == 'success'
+        run: |
+          rm -rf PayloadLite && mkdir -p PayloadLite/Payload
+          cp -R build/SawtLite.xcarchive/Products/Applications/SawtLite.app PayloadLite/Payload/
+          A=PayloadLite/Payload/SawtLite.app
+          for f in $A/Frameworks/*.framework; do [ -d "$f" ] && codesign -f -s - "$f"; done || true
+          for x in $A/PlugIns/*.appex; do [ -d "$x" ] && codesign -f -s - "$x"; done || true
+          # الصلاحيات نفسها: زيادة الذاكرة ومساحة العناوين فقط (لا get-task-allow)
+          codesign -f -s - --entitlements ent.plist $A || echo "codesign skipped"
+          codesign -d --entitlements - $A || true
+          (cd PayloadLite && zip -qry ../SawtLite.ipa Payload)
+          ls -lh SawtLite.ipa
+
       - uses: actions/upload-artifact@v4
         with:
           name: Sawt-ipa
-          path: Sawt.ipa
+          path: |
+            Sawt.ipa
+            SawtLite.ipa
+          if-no-files-found: warn
 
       - name: نشر إصدار
         uses: softprops/action-gh-release@v2
         with:
           tag_name: build-${{ github.run_number }}
-          name: صوت ${{ steps.ver.outputs.version }} (بناء ${{ github.run_number }})
+          name: صوت ${{ steps.ver.outputs.version }} · صوت لايت ${{ steps.ver.outputs.lite }} (بناء ${{ github.run_number }})
           body: ${{ github.event.head_commit.message }}
           prerelease: true
-          files: Sawt.ipa
+          files: |
+            Sawt.ipa
+            SawtLite.ipa
+          fail_on_unmatched_files: false
 
       - name: نشر ملف التحديث العام
         # ننشر update.json بس (بدون IPA) في مستودع عام، لأن تراخيص بعض الأصوات المدمجة ما تسمح بإعادة النشر العام.
@@ -207,6 +249,29 @@ jobs:
           SHA=$(gh api repos/$PUB/contents/update.json --jq .sha 2>/dev/null || echo "")
           gh api -X PUT repos/$PUB/contents/update.json -f message="تحديث $V (بناء $N)" \
             -f content="$(base64 < /tmp/update.json | tr -d '\n')" ${SHA:+-f sha=$SHA}
+
+      - name: نشر ملف تحديث صوت لايت
+        if: steps.lite.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ secrets.SAWT_RELEASES_TOKEN }}
+        run: |
+          if [ -z "$GH_TOKEN" ]; then echo "no SAWT_RELEASES_TOKEN, skipping"; exit 0; fi
+          set -e
+          N=${{ github.run_number }}
+          V=${{ steps.ver.outputs.lite }}
+          PUB=za7ef/sawt-releases
+          if [ -f Lite/whatsnew.md ]; then cp Lite/whatsnew.md /tmp/notes-lite.txt; else : > /tmp/notes-lite.txt; fi
+          python3 - "$V" "$N" "${{ github.repository }}" <<'PY'
+          import json, sys
+          v, n, repo = sys.argv[1], int(sys.argv[2]), sys.argv[3]
+          notes = open("/tmp/notes-lite.txt").read().strip()
+          json.dump({"version": v, "build": n, "notes": notes,
+                     "url": f"https://github.com/{repo}/releases/tag/build-{n}"},
+                    open("/tmp/update-lite.json", "w"), ensure_ascii=False, indent=2)
+          PY
+          SHA=$(gh api repos/$PUB/contents/update-lite.json --jq .sha 2>/dev/null || echo "")
+          gh api -X PUT repos/$PUB/contents/update-lite.json -f message="تحديث صوت لايت $V (بناء $N)" \
+            -f content="$(base64 < /tmp/update-lite.json | tr -d '\n')" ${SHA:+-f sha=$SHA}
 
       - name: تنظيف الإصدارات القديمة
         env:
