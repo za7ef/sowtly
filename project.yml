@@ -42,7 +42,7 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.za7ef.sawt
         PRODUCT_NAME: Sawt
-        MARKETING_VERSION: "0.4.0"
+        MARKETING_VERSION: "0.4.1"
         CURRENT_PROJECT_VERSION: "1"  # يتعيّن تلقائيًا من رقم تشغيل الـCI
         SWIFT_VERSION: "5.0"
         TARGETED_DEVICE_FAMILY: "1"
@@ -100,7 +100,7 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.za7ef.sawt.widgets
         PRODUCT_NAME: SawtWidgets
-        MARKETING_VERSION: "0.4.0"
+        MARKETING_VERSION: "0.4.1"
         CURRENT_PROJECT_VERSION: "1"
         SWIFT_VERSION: "5.0"
         TARGETED_DEVICE_FAMILY: "1"
