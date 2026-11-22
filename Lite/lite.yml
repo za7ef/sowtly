@@ -1,0 +1,151 @@
+# هدف «صوت لايت» (Sawt Lite): نسخة خفيفة من Sowtly تُبنى من الشيفرة نفسها.
+# - لا يدخل فيها الوكيل والتحكم بالجهاز (XCTest/DDI/الاقتران/sawtctl) ولا llama.cpp ولا تبويب المعالج.
+# - الملفات المختلفة في Lite/ تحل محل نظيراتها في Sawt/ (الأصل مستثنى من هذا الهدف فقط).
+# - هدف Sowtly في project.yml لم يتغيّر.
+# رقم إصدار لايت مستقل هنا (يُرفع يدويًا)، ورقم البناء مشترك مع Sowtly (رقم تشغيل الـCI).
+targets:
+  SawtLite:
+    type: application
+    platform: iOS
+    sources:
+      - path: Sawt
+        excludes:
+          - "Resources/Voices"
+          - "Info.plist"
+          - "Sawt-Bridging-Header.h"
+          # الوكيل والتحكم بالجهاز
+          - "Agent/**"
+          - "ObjC/SawtXCT.h"
+          - "ObjC/SawtXCT.m"
+          - "UI/HostPairing.swift"
+          - "UI/PhoneControlView.swift"
+          # محرك المعالج (llama.cpp)
+          - "LLM/LlamaEngine.swift"
+          # ملفات لها نسخة خاصة في Lite/Sawt
+          - "App/Catalog.swift"
+          - "App/ChatStore.swift"
+          - "App/ModelManager.swift"
+          - "App/Placement.swift"
+          - "App/UpdateChecker.swift"
+          - "App/VoiceDownloads.swift"
+          - "Call/CallController.swift"
+          - "LLM/CloudKeys.swift"
+          - "LLM/CloudLLM.swift"
+          - "LLM/LLMService.swift"
+          - "Resources/About/AudarAI-Open-License-v1.0.txt"
+          - "Resources/About/about.en.md"
+          - "Resources/About/about.md"
+          - "Resources/About/privacy.en.md"
+          - "Resources/About/privacy.md"
+          - "Resources/About/terms.en.md"
+          - "Resources/About/terms.md"
+          - "Speech/Audar/AudarTTS.swift"
+          - "Speech/STT.swift"
+          - "Speech/TTS.swift"
+          - "UI/AboutView.swift"
+          - "UI/ChatView.swift"
+          - "UI/GenImageView.swift"
+          - "UI/ImageViewer.swift"
+          - "UI/ModelsView.swift"
+          - "UI/RootView.swift"
+          - "UI/SawtApp.swift"
+          - "UI/SettingsView.swift"
+          - "UI/StreamTimeline.swift"
+          - "UI/VoiceModeView.swift"
+          - "ar.lproj/InfoPlist.strings"
+          - "en.lproj/InfoPlist.strings"
+      - path: Sawt/Resources/Voices
+        type: folder
+        buildPhase: resources
+      - path: Shared
+        excludes:
+          - "AgentActivityShared.swift"
+          - "en.lproj/Localizable.strings"
+      - path: Lite/Sawt
+      - path: Lite/Shared
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.za7ef.sawt.lite
+        PRODUCT_NAME: SawtLite
+        MARKETING_VERSION: "0.1"
+        CURRENT_PROJECT_VERSION: "1"  # يتعيّن تلقائيًا من رقم تشغيل الـCI
+        SWIFT_VERSION: "5.0"
+        TARGETED_DEVICE_FAMILY: "1"
+        INFOPLIST_FILE: Lite/Info.plist
+        CODE_SIGNING_ALLOWED: "NO"
+        CODE_SIGNING_REQUIRED: "NO"
+        CODE_SIGN_IDENTITY: ""
+        ENABLE_BITCODE: "NO"
+        OTHER_LDFLAGS: ["-lc++"]
+        SWIFT_ACTIVE_COMPILATION_CONDITIONS: ["$(inherited)", "LITE"]
+        LD_RUNPATH_SEARCH_PATHS: ["$(inherited)", "@executable_path/Frameworks"]
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        SWIFT_OBJC_BRIDGING_HEADER: Lite/Lite-Bridging-Header.h
+    dependencies:
+      - target: SawtLiteWidgets
+        embed: true
+      - package: MLXSwift
+        product: MLX
+      - package: MLXSwift
+        product: MLXNN
+      - package: MLXSwift
+        product: MLXFFT
+      - package: MLXSwift
+        product: MLXRandom
+      - package: MLXSwiftLM
+        product: MLXLLM
+      - package: MLXSwiftLM
+        product: MLXVLM
+      - package: MLXSwiftLM
+        product: MLXLMCommon
+      - package: MLXSwiftLM
+        product: MLXHuggingFace
+      - package: SwiftHuggingFace
+        product: HuggingFace
+      - package: SwiftTransformers
+        product: Tokenizers
+      - package: SherpaOnnx
+        product: sherpa-onnx
+      - package: SawtSD
+        product: StableDiffusion
+  SawtLiteWidgets:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: Lite/SawtWidgets
+        excludes:
+          - "Info.plist"
+      - path: Shared
+        excludes:
+          - "AgentActivityShared.swift"
+          - "en.lproj/Localizable.strings"
+      - path: Lite/Shared
+    info:
+      path: Lite/SawtWidgets/Info.plist
+      properties:
+        CFBundleDisplayName: Sawt Lite
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.za7ef.sawt.lite.widgets
+        PRODUCT_NAME: SawtLiteWidgets
+        MARKETING_VERSION: "0.1"
+        CURRENT_PROJECT_VERSION: "1"
+        SWIFT_VERSION: "5.0"
+        TARGETED_DEVICE_FAMILY: "1"
+        SWIFT_ACTIVE_COMPILATION_CONDITIONS: ["$(inherited)", "LITE"]
+        CODE_SIGNING_ALLOWED: "NO"
+        CODE_SIGNING_REQUIRED: "NO"
+        CODE_SIGN_IDENTITY: ""
+        SKIP_INSTALL: "YES"
+
+schemes:
+  SawtLite:
+    build:
+      targets:
+        SawtLite: all
+    archive:
+      config: Release

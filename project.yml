@@ -1,4 +1,8 @@
 name: Sawt
+# هدف «صوت لايت» في ملف مستقل (Lite/lite.yml)؛ هدف Sowtly أدناه دون تغيير
+include:
+  - path: Lite/lite.yml
+    relativePaths: false
 options:
   bundleIdPrefix: com.za7ef
   deploymentTarget:

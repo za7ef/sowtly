@@ -1,0 +1,7 @@
+"CFBundleDisplayName" = "Sawt Lite";
+"NSCameraUsageDescription" = "To take a photo and attach it to the chat. The photo stays on your device.";
+"NSLocationWhenInUseUsageDescription" = "To know your city when you ask about the weather without naming it. Only the city name is saved.";
+"NSPhotoLibraryAddUsageDescription" = "To save images Sawt Lite creates to your photo library.";
+"NSPhotoLibraryUsageDescription" = "To choose a photo and attach it to the chat. The photo stays on your device.";
+"NSSpeechRecognitionUsageDescription" = "To turn your speech into text on the device so it can understand you.";
+"NSMicrophoneUsageDescription" = "Sawt Lite needs the microphone so you can talk to it directly. Your voice is processed on your device and never saved.";

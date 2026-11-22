@@ -1,0 +1,7 @@
+"CFBundleDisplayName" = "صوت لايت";
+"NSCameraUsageDescription" = "لالتقاط صورة وإرفاقها في المحادثة. تبقى الصورة على جهازك.";
+"NSLocationWhenInUseUsageDescription" = "لمعرفة مدينتك عند السؤال عن الطقس دون ذكرها. لا يُحفظ إلا اسم المدينة.";
+"NSPhotoLibraryAddUsageDescription" = "لحفظ الصور التي يرسمها صوت لايت في مكتبة الصور.";
+"NSPhotoLibraryUsageDescription" = "لاختيار صورة وإرفاقها في المحادثة. تبقى الصورة على جهازك.";
+"NSSpeechRecognitionUsageDescription" = "لتحويل كلامك إلى نص على الجهاز حتى يفهمك.";
+"NSMicrophoneUsageDescription" = "يحتاج صوت لايت إلى الميكروفون لتتحدث معه مباشرة. يُعالَج صوتك على جهازك ولا يُحفظ.";
