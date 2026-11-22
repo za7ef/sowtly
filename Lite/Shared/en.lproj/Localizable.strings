@@ -867,3 +867,5 @@
 "عربي فصيح واضح، متعدد اللغات" = "Clear Modern Standard Arabic, multilingual";
 "فصحى، أوضح نطقًا" = "MSA, clearer pronunciation";
 "لم يعمل النموذج على المعالج: %@. أعد «تشغيل النموذج» إلى معالج الرسوميات." = "The model failed on the CPU: %@. Switch “Run Model” back to GPU.";
+"موصى به" = "Recommended";
+"النماذج على الجهاز" = "On-Device Models";

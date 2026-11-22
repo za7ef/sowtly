@@ -71,7 +71,7 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.za7ef.sawt.lite
         PRODUCT_NAME: SawtLite
-        MARKETING_VERSION: "0.1"
+        MARKETING_VERSION: "0.2"
         CURRENT_PROJECT_VERSION: "1"  # يتعيّن تلقائيًا من رقم تشغيل الـCI
         SWIFT_VERSION: "5.0"
         TARGETED_DEVICE_FAMILY: "1"
@@ -140,7 +140,7 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.za7ef.sawt.lite.widgets
         PRODUCT_NAME: SawtLiteWidgets
-        MARKETING_VERSION: "0.1"
+        MARKETING_VERSION: "0.2"
         CURRENT_PROJECT_VERSION: "1"
         SWIFT_VERSION: "5.0"
         TARGETED_DEVICE_FAMILY: "1"

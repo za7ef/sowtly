@@ -38,14 +38,38 @@ struct VoiceOption: Identifiable, Hashable {
 }
 
 enum Catalog {
-    /// نموذج واحد فقط في صوت لايت (MLX بدقة 4 بت على كرت الشاشة). الحجم متحقق منه من Hugging Face (نوفمبر 2026).
-    /// يدعم الصور بنفس الملفات (MLXVLM)، فلا يوجد تنزيل ثانٍ.
+    /// نماذج MLX بدقة 4 بت على معالج الرسوميات فقط، يختار المستخدم واحدًا منها. كل الأحجام متحقق منها من Hugging Face (نوفمبر 2026).
+    /// الأول هو الافتراضي والموصى به.
     static let builtInLLMs: [LLMOption] = [
         LLMOption(id: "mlx-community/Qwen3.5-4B-4bit", title: "Qwen3.5 4B", sizeGB: 3.06, ramGB: 3.8,
-                  speed: L("سريع على معالج الرسوميات"), arabic: L("عربي ممتاز"), tag: L("النموذج الوحيد"), vision: true),
+                  speed: L("متوسط"), arabic: L("عربي ممتاز"), tag: L("موصى به"), vision: true),
+        LLMOption(id: "mlx-community/Qwen3.5-2B-4bit", title: "Qwen3.5 2B", sizeGB: 1.72, ramGB: 2.4,
+                  speed: L("سريع جدًا"), arabic: L("عربي جيد"), tag: L("الأسرع والأخف"), vision: true),
+        LLMOption(id: "mlx-community/Qwen3-4B-4bit", title: "Qwen3 4B", sizeGB: 2.26, ramGB: 3.0,
+                  speed: L("سريع"), arabic: L("عربي ممتاز ولهجات جيدة")),
+        LLMOption(id: "mlx-community/gemma-3-4b-it-qat-4bit", title: "Gemma 3 4B", sizeGB: 3.0, ramGB: 3.8,
+                  speed: L("متوسط"), arabic: L("عربي ممتاز وأسلوب طبيعي"), vision: true),
+        LLMOption(id: "mlx-community/gemma-4-e2b-it-4bit", title: "Gemma 4 E2B", sizeGB: 3.55, ramGB: 3.5,
+                  speed: L("متوسط"), arabic: L("عربي ممتاز"), vision: true),
+        LLMOption(id: "mlx-community/Qwen2.5-3B-Instruct-4bit", title: "Qwen2.5 3B", sizeGB: 1.74, ramGB: 2.4,
+                  speed: L("سريع"), arabic: L("عربي جيد")),
+        LLMOption(id: "mlx-community/Llama-3.2-3B-Instruct-4bit", title: "Llama 3.2 3B", sizeGB: 1.81, ramGB: 2.5,
+                  speed: L("سريع"), arabic: L("عربي مقبول")),
+        LLMOption(id: "mlx-community/Phi-4-mini-instruct-4bit", title: "Phi-4 Mini", sizeGB: 2.16, ramGB: 2.9,
+                  speed: L("سريع"), arabic: L("عربي ضعيف، إنجليزي قوي")),
+        LLMOption(id: "mlx-community/SmolLM3-3B-4bit", title: "SmolLM3 3B", sizeGB: 1.73, ramGB: 2.4,
+                  speed: L("سريع"), arabic: L("عربي ضعيف")),
+        LLMOption(id: "mlx-community/Qwen3-1.7B-4bit", title: "Qwen3 1.7B", sizeGB: 0.97, ramGB: 1.5,
+                  speed: L("سريع جدًا"), arabic: L("عربي مقبول")),
+        LLMOption(id: "mlx-community/gemma-3-1b-it-qat-4bit", title: "Gemma 3 1B", sizeGB: 0.73, ramGB: 1.2,
+                  speed: L("سريع جدًا"), arabic: L("عربي مقبول")),
+        LLMOption(id: "mlx-community/Llama-3.2-1B-Instruct-4bit", title: "Llama 3.2 1B", sizeGB: 0.7, ramGB: 1.2,
+                  speed: L("سريع جدًا"), arabic: L("عربي ضعيف")),
+        LLMOption(id: "mlx-community/Qwen3-0.6B-4bit", title: "Qwen3 0.6B", sizeGB: 0.34, ramGB: 0.8,
+                  speed: L("لحظي"), arabic: L("للتجربة فقط")),
     ]
 
-    /// لا توجد نماذج مخصصة في صوت لايت (نموذج واحد فقط)
+    /// لا توجد نماذج مخصصة في صوت لايت (القائمة المعتمدة فقط)
     static var customLLMs: [LLMOption] { [] }
 
     static var llms: [LLMOption] { builtInLLMs + customLLMs }

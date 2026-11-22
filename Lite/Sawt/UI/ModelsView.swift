@@ -43,7 +43,7 @@ struct ModelsView: View {
                 Section {
                     ForEach(Catalog.builtInLLMs) { row($0) }
                 } header: {
-                    Text("النموذج على الجهاز")
+                    Text("النماذج على الجهاز")
                 } footer: {
                     Text(L("ذاكرة جهازك نحو %@ GB. تُحمَّل النماذج مرة واحدة وتعمل دون إنترنت.", String(format: "%.0f", ramGB)))
                 }
