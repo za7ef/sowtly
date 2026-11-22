@@ -406,5 +406,9 @@ final class MLXErrBox: @unchecked Sendable {
 
 struct MLXRunError: LocalizedError {
     var message: String
-    var errorDescription: String? { L("حدث خطأ في النموذج: %@", String(message.prefix(160))) }
+    var cpu: Bool = false
+    var errorDescription: String? {
+        cpu ? L("لم يعمل النموذج على المعالج: %@. أعد «تشغيل النموذج» إلى معالج الرسوميات.", String(message.prefix(160)))
+            : L("حدث خطأ في النموذج: %@", String(message.prefix(160)))
+    }
 }
