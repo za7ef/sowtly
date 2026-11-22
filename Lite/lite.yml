@@ -60,7 +60,11 @@ targets:
       - path: Shared
         excludes:
           - "AgentActivityShared.swift"
-          - "en.lproj/Localizable.strings"
+          # ملفات النصوص كلها من Lite/Shared (تجنبًا لتكرار مخرجات الترجمة)
+          - "ar.lproj"
+          - "ar.lproj/**"
+          - "en.lproj"
+          - "en.lproj/**"
       - path: Lite/Sawt
       - path: Lite/Shared
     settings:
@@ -118,7 +122,11 @@ targets:
       - path: Shared
         excludes:
           - "AgentActivityShared.swift"
-          - "en.lproj/Localizable.strings"
+          # ملفات النصوص كلها من Lite/Shared (تجنبًا لتكرار مخرجات الترجمة)
+          - "ar.lproj"
+          - "ar.lproj/**"
+          - "en.lproj"
+          - "en.lproj/**"
       - path: Lite/Shared
     info:
       path: Lite/SawtWidgets/Info.plist
